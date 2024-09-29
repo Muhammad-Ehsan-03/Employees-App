@@ -1,7 +1,18 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './App.css'
 
 function App() {
+  useEffect( () => {
+    if(localStorage.getItem('EmployeesData')!=null)
+    {
+      console.log('page Refresh');
+      const oldData=JSON.parse(localStorage.EmployeesData);
+      setEmployeesData(oldData);
+    }
+    else{
+      console.log('page Refresh But Data Empty');
+    }
+   } ,[]);
   // fname f is firsrt
   let [fName, setFName] = useState('');
   const changefirstName = (e: any) => {
@@ -24,12 +35,13 @@ function App() {
   const changeContact = (e: any) => {
     setContact(e.target.value);
   }
-  let [id, setId] = useState<number>(0);
+  let [id, setId] = useState<number>(1);
   let [isEditing, setEditing] = useState(false);
   let [isCreating, setCreating] = useState(false);
   let [isList, setList] = useState(true);
-  let Employeesid = useRef(0)
-  let [EmployeesData, seEmployeesData] = useState<Array<EmployeesDatatype>>([]);
+  let Employeesid = useRef(1)
+  let [isChanges, setChanges] = useState(false);
+  let [EmployeesData, setEmployeesData] = useState<Array<EmployeesDatatype>>([]);
   interface EmployeesDatatype {
     id: number;
     firstName: string;
@@ -39,8 +51,12 @@ function App() {
     contact: number;
   };
   const AddEmploy = () => {
+    setChanges(false)
+    debugger
     setList(true)
     if (isCreating == true) {
+      if(id && fName && lName && email && adress && contact)
+    {
       EmployeesData.push(
         {
           id: id,
@@ -52,33 +68,33 @@ function App() {
         }
       )
     }
-    console.log(EmployeesData)
+    }
+    console.log(EmployeesData);
     if (isEditing == true) {
       let index;
       EmployeesData.map((d, i) => {
-        if (d.id = id) {
+        if (d.id == id) {
           index = i;
         }
       }
       )
-      EmployeesData[index].firstName = fName;
-      EmployeesData[index].lastName = lName;
-      EmployeesData[index].email = email;
-      EmployeesData[index].adress = adress;
-      EmployeesData[index].contact = contact;
+     EmployeesData[index].lastName = lName;
+     EmployeesData[index].firstName = fName;
+     EmployeesData[index].email = email;
+     EmployeesData[index].adress = adress;
+     EmployeesData[index].contact = contact;
     }
-    seEmployeesData(
-      [
-        ...EmployeesData
-      ]
-    )
+   const newData =[...EmployeesData];
+   setEmployeesData(newData);
+   localStorage.setItem('EmployeesData' , JSON.stringify(newData));
     setCreating(false);
     setEditing(false)
   }
   const EditEmployeesData = (d) => {
-    console.log(EmployeesData);
+    setChanges(true)
     setEditing(true);
     setCreating(false);
+    setId(d.id)
     setFName(d.firstName);
     setLName(d.lastName);
     setEmail(d.email);
@@ -86,8 +102,9 @@ function App() {
     setContact(d.contact);
   }
   const CreateEmployeesData = () => {
+    setChanges(true)
     setAdress('');
-    setContact("");
+    setContact('');
     setFName('');
     setLName("");
     setEmail("");
@@ -96,18 +113,17 @@ function App() {
     setCreating(true);
     Employeesid.current++
     setId(Employeesid.current)
+    console.log(id);
   }
   const DeleteEmploy = (i) => {
     EmployeesData.splice(i, 1);
-    seEmployeesData(
-      [
-        ...EmployeesData
-      ]
-    )
+    const newData =[...EmployeesData]
+   setEmployeesData(newData);
+   localStorage.setItem('EmployeesData' , JSON.stringify(newData));
   }
   const changes=() => 
   {
-    document.querySelector('.Main').style.display='none';
+    setChanges(false)
     setList(true);
   }
   return (
@@ -121,7 +137,7 @@ function App() {
         </div>
       </div>
       <div className="space"></div>
-      <div className="Main">
+      <div className={isChanges==true? "Main":'Main d-none'}>
         <div className={isEditing == true || isCreating == true ? "row " : "row d-none"}>
           <div className="Header">
             <h4>Update Employee</h4>
