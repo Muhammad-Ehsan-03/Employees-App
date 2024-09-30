@@ -1,3 +1,14 @@
-.header{
-    background-color: rgb(99, 67, 127);
+h4{
+    display: inline-block;
+    margin: 0 0.5rem;
+  
+    animation: bounce;
+    animation-duration: 1s;
 }
+:root {
+    --animate-duration: 800ms;
+    --animate-delay: 0.1s;
+  }
+  :root {
+    --animate-delay: 0.5s;
+  }
