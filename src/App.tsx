@@ -48,12 +48,12 @@ function App() {
   let [isChanges, setChanges] = useState(false);
   let [EducationInput, setEducationInput] = useState(false);
   let [Buttoon, setButtoon] = useState(true);
+  let [BackButtoon, setBackButtoon] = useState(false);
   let [title, setTitle] = useState();
   let [Level, setlevel] = useState();
   let EmployeesEducationid = useRef(0);
   let [id, setId] = useState<number>(1);
   let [EmployeesData, setEmployeesData] = useState<Array<EmployeesDatatype>>([]);
-  let [EducationData, setEducationData] = useState<Array<Education>>([]);
   interface EmployeesDatatype {
     id: number;
     firstName: string;
@@ -110,6 +110,7 @@ function App() {
     setEditing(false)
   }
   const EditEmployeesData = (d) => {
+    setList(false)
     setChanges(true)
     setEditing(true);
     setCreating(false);
@@ -133,19 +134,39 @@ function App() {
     Employeesid.current++
     setId(Employeesid.current)
   }
-  const DeleteEmploy = (i) => {
-    EmployeesData.splice(i, 1);
+  const DeleteEmploy = (iD) => {
+    let index;
+    EmployeesData.map((d, i) => {
+      if (d.id == iD) {
+        index = i;
+      }
+    }
+    )
+    EmployeesData.splice(index, 1);
     const newData =[...EmployeesData]
    setEmployeesData(newData);
    localStorage.setItem('EmployeesData' , JSON.stringify(newData));
   }
   const changes=() => 
   {
-    setChanges(false)
+    setChanges(false);
     setList(true);
     setEducationInput(false);
-    setEducationList(true);
+    setEducationList(false);
   }
+  const Educationchanges=() => 
+    {
+      setChanges(false)
+      setList(false);
+      setEducationInput(false);
+      setEducationList(true);
+    }
+    
+  const BackEducation=() => 
+    {
+      setList(true);
+      setEducationList(false);
+    }
                                                                                     // Today Code 
   const ShowEmployeesEducation = (e) =>
     {
@@ -156,14 +177,21 @@ function App() {
         }
       }
       )
-      if(EmployeesData[index].educations.length<0)
+      if(EmployeesData[index].educations.length==0)
       {
-        console.log('Hello');
+        setBackButtoon(false);
+        setButtoon(true);
+        setBackButtoon(true);
+      }
+      else
+      {
+        setButtoon(false);
+        setBackButtoon(true)
       }
       setName(EmployeesData[index].firstName);
       setIde(index);
       setEducationList(true);
-      setList(false)
+      setList(false);
     }
     const ShowInputsEducation = () =>
       {
@@ -199,12 +227,15 @@ function App() {
         setEmployeesData(newData);
         localStorage.setItem('EmployeesData' , JSON.stringify(newData));
         setEducationList(true);
+        setButtoon(false);
+        setBackButtoon(true);
       }
       const EditingEducation=(e) => 
       {
           setEducationInput(true);
           setEducationEditing(true);
           setEducationCreating(false);
+          setEducationList(false);
           setId(e.id);
           setTitle(e.title);
           setlevel(e.Level);
@@ -222,6 +253,8 @@ function App() {
           const newData =[...EmployeesData]
          setEmployeesData(newData);
          localStorage.setItem('EmployeesData' , JSON.stringify(newData));
+         setBackButtoon(false);
+         setButtoon(true);
         }
   return (
     <div>
@@ -259,7 +292,10 @@ function App() {
         <div className="header-2">
             <h4 className="  animate_animate__fadeInDownBig ">Education of {Name}</h4>
             <div className="Add-Education">
-              <button type="button" className= "btn btn-success" onClick={ShowInputsEducation}><i className="fa-solid fa-book-open"></i>Add Education</button>
+              <button type="button" className= {Buttoon==true? "btn btn-success":"btn btn-success d-none"} onClick={ShowInputsEducation}><i className="fa-solid fa-book-open"></i>Add Education</button>
+            </div>
+            <div className="back-button">
+              <button type="button" className={BackButtoon==true?"btn btn-success":"btn btn-success d-none"} onClick={BackEducation}><i className="fa-solid fa-circle-arrow-left"></i> BACK</button>
             </div>
           </div>
       {
@@ -295,7 +331,7 @@ function App() {
           <div className="Header">
             <h4 className="  animate_animate__fadeInDownBig ">Update Employee</h4>
             <div className="back-button">
-              <button type="button" className="btn btn-success" onClick={changes}><i className="fa-solid fa-circle-arrow-left"></i> BACK</button>
+              <button type="button" className="btn btn-success" onClick={Educationchanges}><i className="fa-solid fa-circle-arrow-left"></i> BACK</button>
             </div>
           </div>
           <div className="input">
@@ -354,7 +390,7 @@ function App() {
                     <td>{em.email}</td>
                     <td>{em.adress}</td>
                     <td>{em.contact}</td>
-                    <td className="text-danger"><i className="fa-solid fa-trash" onClick={() => { DeleteEmploy(i) }}></i></td>
+                    <td className="text-danger"><i className="fa-solid fa-trash" onClick={() => { DeleteEmploy(em.id) }}></i></td>
                     <td className="text-warning"><i className="fa-solid fa-pen-to-square" onClick={() => { EditEmployeesData(em); }}></i></td>
                     <td><button className="btn btn-success" onClick={() =>{ShowEmployeesEducation(em.id)}}>Education</button></td>
                   </tr>
