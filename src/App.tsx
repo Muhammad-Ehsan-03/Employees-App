@@ -131,8 +131,10 @@ function App() {
     setList(false);
     setEditing(false);
     setCreating(true);
+    console.log(id);
     Employeesid.current++
     setId(Employeesid.current)
+    console.log(id);
   }
   const DeleteEmploy = (iD) => {
     let index;
@@ -177,19 +179,10 @@ function App() {
         }
       }
       )
-      if(EmployeesData[index].educations.length==0)
-      {
-        setBackButtoon(false);
-        setButtoon(true);
-        setBackButtoon(true);
-      }
-      else
-      {
-        setButtoon(false);
-        setBackButtoon(true)
-      }
+      setBackButtoon(true);
       setName(EmployeesData[index].firstName);
       setIde(index);
+      console.log(ide);
       setEducationList(true);
       setList(false);
     }
@@ -198,17 +191,25 @@ function App() {
       setEducationList(false);
       setTitle('');
       setlevel('');
+      console.log(ide);
         setEducationInput(true);
         setEducationEditing(false);
         setEducationCreating(true);
         EmployeesEducationid.current++
         setIdd(EmployeesEducationid.current);
       }
-      const saveEducation = (i) => 
+      const saveEducation = () => 
       {
+        console.log(ide);
         if(isEducationCreating==true)
         {
-        EmployeesData[ide].educations.push({id:idd,title:title,level:Level});
+        EmployeesData[ide].educations.push(
+        {
+          id:idd,
+          title:title,
+          level:Level
+        }
+      );
         }
         if(isEducationEditing==true)
         {
@@ -219,10 +220,10 @@ function App() {
             }
           }
           )
-          EmployeesData[index].educations[0].title =title;
-          EmployeesData[index].educations[0].level =Level;
+          EmployeesData[index].educations[idd].title =title;
+          EmployeesData[index].educations[idd].level =Level;
         }
-        setEducationInput(false)
+        setEducationInput(false);
         const newData =[...EmployeesData];
         setEmployeesData(newData);
         localStorage.setItem('EmployeesData' , JSON.stringify(newData));
@@ -236,7 +237,7 @@ function App() {
           setEducationEditing(true);
           setEducationCreating(false);
           setEducationList(false);
-          setId(e.id);
+          setIdd(e.id);
           setTitle(e.title);
           setlevel(e.Level);
       }
@@ -292,17 +293,19 @@ function App() {
         <div className="header-2">
             <h4 className="  animate_animate__fadeInDownBig ">Education of {Name}</h4>
             <div className="Add-Education">
-              <button type="button" className= {Buttoon==true? "btn btn-success":"btn btn-success d-none"} onClick={ShowInputsEducation}><i className="fa-solid fa-book-open"></i>Add Education</button>
+              <button type="button" className="btn btn-success" onClick={ShowInputsEducation}><i className="fa-solid fa-book-open"></i>Add Education</button>
             </div>
             <div className="back-button">
               <button type="button" className={BackButtoon==true?"btn btn-success":"btn btn-success d-none"} onClick={BackEducation}><i className="fa-solid fa-circle-arrow-left"></i> BACK</button>
             </div>
           </div>
       {
-         
+        //  'table table-striped'
             EmployeesData.map((emp: EmployeesDatatype, i) => (
               <div className={emp.educations.length > 0 ? 'Education': 'Education d-none'}>
-              <table className={ide==i? 'table table-striped':'table table-striped d-none'}>
+                    <div className={ide==i? 'row':'row d-none'}>
+                {emp.educations.map( (em:Education,i)=> (
+              <table className='table table-striped'>
                 <thead>
                   <tr>
                     <th scope="col">Title</th>
@@ -312,15 +315,17 @@ function App() {
                   </tr>
                 </thead>
                 <tbody>
-                  
-                  <tr>
-                  <td>{emp.educations.length > 0 ? emp.educations[0].title : 'No Education'}</td>
-                  <td>{emp.educations.length > 0 ? emp.educations[0].level : 'No Education'}</td>
+                <tr>
+                
+                    <td>{em.title}</td>
+                    <td>{em.level}</td>
                     <td className="text-danger"><i className="fa-solid fa-trash" onClick={() => { DeleteEducation(emp.id) }}></i></td>
                     <td className="text-warning"><i className="fa-solid fa-pen-to-square" onClick={() => { EditingEducation(emp); }}></i></td>
                   </tr>
                 </tbody>
               </table>
+            ))}
+            </div>
               </div>
             ))
           }
