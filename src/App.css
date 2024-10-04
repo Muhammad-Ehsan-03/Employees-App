@@ -12,3 +12,14 @@ h4{
   :root {
     --animate-delay: 0.5s;
   }
+  #Name
+  {
+    color:blue;
+    border: none;
+  }
+  /* .row
+  {
+    width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  } */
