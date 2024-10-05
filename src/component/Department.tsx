@@ -11,9 +11,9 @@ function Department() {
       console.log('page Refresh But Data Empty');
     }
   }, []);
-
   let [dpName, setDpName] = useState();
   let [dpDescription, setDpDescription] = useState();
+  let [dpCode, setdpCode] = useState<number>(100);
   let [departmentData, setdepartmentData] = useState<Array<DepartmentDatatype>>([]);
   let [isCreating, setCreating] = useState(false);
   let [isEditing, setEditing] = useState(false);
@@ -22,17 +22,14 @@ function Department() {
   let [departmentid, setdepartmentId] = useState<number>();
   let [isList, setList] = useState(true);
   let departmentIdd =useRef(0);
-  interface DepartmentDatatype {
-    id: number;
-    department: string;
-    description: string;
-  };
-  const AddEmploy = () => {
+   let DepartmentCode=useRef(100);
+    const AddEmploy = () => {
     debugger;
     if (isCreating == true) {
       if (departmentid && dpName && dpDescription) {
         departmentData.push(
           {
+            code:dpCode,
             id:departmentid,
             department: dpName,
             description: dpDescription
@@ -72,6 +69,8 @@ function Department() {
      setDpName('');
      departmentIdd.current++;
      setdepartmentId(departmentIdd.current);
+     DepartmentCode.current++;
+     setdpCode(DepartmentCode.current)
      setEditing(false);
      setCreating(true);
   }
@@ -88,17 +87,24 @@ function Department() {
     setdepartmentData(newData);
     localStorage.setItem('departmentData', JSON.stringify(newData));
   }
-  const Crud = () => {
+  const changes = () => {
+    setList(true);
+      setEditing(false);
+      setCreating(false)
+
+  }
+  const Crude = () => {
+    console.log('hello Crud');
     setCrud(true);
     setdepartment(false);
   }
   return (
     <div>
-        <div className={isCrud==true? "cd":"cd d-none"}>
-    <EmployessCrud></EmployessCrud>
-    </div> 
-      <div className={isdepartment==true?"main":"main"}>
-      <div className="header">
+      {/*<div className={isCrud==true?"div":"div d-none"}>
+        <EmployessCrud></EmployessCrud>
+    </div>*/}
+      <div className={isdepartment==true?"main":"main d-none"}>
+      <div className="header">          
         <div className="home_icon">
           <i className="fa-solid fa-house-chimney"></i>
         </div>
@@ -112,7 +118,7 @@ function Department() {
           <div className="Header">
             <h4>Update Department</h4>
             <div className="back-button">
-              <button type="button" className="btn btn-success"><i className="fa-solid fa-circle-arrow-left"></i> BACK</button>
+              <button type="button" onClick={changes} className="btn btn-success"><i className="fa-solid fa-circle-arrow-left"> </i> BACK</button>
             </div>
           </div>
           <div className="input">
@@ -132,7 +138,7 @@ function Department() {
               <button type="button" className="btn btn-success" onClick={CreateDepartmentData}>Add</button>
             </div>
             <div className="back-button">
-              <button type="button" className="btn btn-success" onClick={Crud}>Back</button>
+              <button type="button" className="btn btn-success" onClick={Crude}><i className="fa-solid fa-circle-arrow-left"> </i>Back</button>
             </div>
           </div>
           {
@@ -140,7 +146,7 @@ function Department() {
               <table className="table table-striped">
                 <thead>
                   <tr>
-                    <th scope="col">Department Id</th>
+                    <th scope="col">Department code</th>
                     <th scope="col">Department Name</th>
                     <th scope="col">Description</th>
                     <th scope="col">Actions</th>
@@ -148,7 +154,7 @@ function Department() {
                 </thead>
                 <tbody>
                   <tr>
-                  <td>{dp.id}</td>
+                  <td>{dp.code}</td>
                     <td>{dp.department}</td>
                     <td>{dp.description}</td>
                     <td className="text-danger"><i className="fa-solid fa-trash"   onClick={() => { DeleteDepartment(dp.id) }}></i></td>
@@ -165,4 +171,10 @@ function Department() {
   )
 }
 
-export default Department
+export default Department; 
+export interface DepartmentDatatype {
+    code:number;
+    id: number;
+    department: string;
+    description: string;
+};

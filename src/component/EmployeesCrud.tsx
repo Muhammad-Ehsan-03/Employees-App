@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import Department from './Department';
+import  Department,{DepartmentDatatype} from './Department';
 function EmployessCrud() {
   useEffect(() => {
     if (localStorage.getItem('EmployeesData') != null) {
@@ -10,9 +10,18 @@ function EmployessCrud() {
     else {
       console.log('page Refresh But Data Empty');
     }
+    // Fetching data of departments
+    if (localStorage.getItem('departmentData') != null) {
+      console.log('page Refresh');
+      const depData = JSON.parse(localStorage.departmentData);
+      setdpData(depData);
+    }
+    else {
+      console.log('page Refresh But Data Empty');
+    }
   }, []);
   // fname f is firsrt
-  let [fName, setFName] = useState('');
+ let [fName, setFName] = useState('');
   const changefirstName = (e: any) => {
     setFName(e.target.value);
   }
@@ -21,6 +30,9 @@ function EmployessCrud() {
   let [Name, setName] = useState('');
 
   let [lName, setLName] = useState('');
+  console.log()
+  let [dpData,setdpData]=useState<Array<DepartmentDatatype>>([]);
+  // <Array<DepartmentDatatype>></Array>
   const changelastName = (e: any) => {
     setLName(e.target.value);
   }
@@ -36,6 +48,7 @@ function EmployessCrud() {
   const changeContact = (e: any) => {
     setContact(e.target.value);
   }
+
   let [idd, setIdd] = useState<number>(1);
   let [ide, setIde] = useState<number>(1);
   let [isEditing, setEditing] = useState(false);
@@ -50,21 +63,24 @@ function EmployessCrud() {
   let [Buttoon, setButtoon] = useState(true);
   let [BackButtoon, setBackButtoon] = useState(false);
   let [title, setTitle] = useState();
+  let [Image, setimage] = useState();
   let [Level, setlevel] = useState();
   let [crud, setcrud] = useState(true);
   let [Ehsan, setEhsan] = useState(true);
   let [deperatment, setdeperatment] = useState(false);
   let EmployeesEducationid = useRef(0);
   let [id, setId] = useState<number>(1);
+  let [dep, setdep] = useState<number>(1);
   let [EmployeesData, setEmployeesData] = useState<Array<EmployeesDatatype>>([]);
-  interface EmployeesDatatype {
-    id: number;
+   interface EmployeesDatatype {
+    id: number; //Primary Key
     firstName: string;
     lastName: string;
     email: string;
     adress: string;
     contact: number;
-    educations: Array<Education>;
+     departmentId:number;  // Foreign key
+     educations: Array<Education>;
   };
   interface Education {
     id: number;
@@ -86,13 +102,13 @@ function EmployessCrud() {
             email: email,
             adress: adress,
             contact: contact,
-            educations: []
+            educations: [],
+            departmentId:dep
           }
         )
         setempInformation(false);
       }
     }
-    console.log(EmployeesData);
     if (isEditing == true) {
       let index;
       EmployeesData.map((d, i) => {
@@ -134,13 +150,12 @@ function EmployessCrud() {
     setFName('');
     setLName("");
     setEmail("");
+    setdep('');
     setList(false);
     setEditing(false);
     setCreating(true);
-    console.log(id);
     Employeesid.current++
     setId(Employeesid.current)
-    console.log(id);
   }
   const DeleteEmploy = (iD) => {
     let index;
@@ -226,8 +241,6 @@ function EmployessCrud() {
         })
       }
     )
-    console.log("Hello",index);
-    console.log('Hello Ehsan',indexEdu);
       EmployeesData[index].educations[indexEdu].title = title;
       EmployeesData[index].educations[indexEdu].level = Level;
     }
@@ -280,8 +293,24 @@ function EmployessCrud() {
     setdeperatment(true);
     setcrud(false);
   }
+  // const handleImage = (e:React.ChangeEvent<HTMLInputElement>) => {
+  //   const file=e.target.files?.[0];
+  //   if(file)
+  //   {
+  //       const reader=new FileReader();
+  //       reader.onloadend=() => {
+  //         const base64Image=reader.result as string;
+  //         setimage(base64Image);
+  //       }
+  //       reader.readAsDataURL(file);
+  //   }
+
+  // }
   return (
     <div>
+      {/* <input type='file' onChange={handleImage}/>
+      {Image && <img src={Image} alt="Uploaded Preview" style={{ width: '200px', height:'auto'} }/>} */}
+
         <div className={deperatment==true?"show":'show d-none'}>
           <Department></Department>          
         </div>
@@ -308,7 +337,17 @@ function EmployessCrud() {
             <div className="one">Last <p> Name</p><span>*</span><input type="text" className="form-control" placeholder="Last Name" onChange={changelastName} value={lName} /></div>
             <div className="one">Email <span>*</span><input type="email" className="form-control" placeholder="Email" onChange={changeEmail} value={email} /></div>
             <div className="one">Address <span>*</span><input type="text" className="form-control" placeholder="Adress" onChange={changeAdress} value={adress} /></div>
-            <div className="one">Contact <span>*</span><input type="text" className="form-control" placeholder="Contact Number" onChange={changeContact} value={contact} /></div>
+            <div className="one">Contact <span>*</span><input type="text" className="form-control" placeholder="Contact Number" onChange={changeContact} value={contact}/></div>
+            <div className="one">Department <span>*</span>
+              
+            <select className="form-select form-select-lg mb-3" aria-label="Large select example" value={dep} onChange={(e) => {setdep(e.target.value)}}>
+                     <option selected>Select Level</option>
+           {dpData.map((d:DepartmentDatatype) => (
+                     <option value={d.code}>{d.department}</option>
+             ))
+            }
+             </select>
+            </div>
             <div className="col-md-2 mx-auto">
               <button type="button" className="btn btn-success" onClick={AddEmploy}>SUBMIT</button>
             </div>
@@ -410,6 +449,14 @@ function EmployessCrud() {
                     <td>{em.contact}</td>
                   </tr>
                   <tr>
+                  <td><label><b>Department</b></label></td>
+                  {dpData.map((d:DepartmentDatatype) => (
+                    <td className={d.code==em.departmentId? 'row':'row d-none'}>
+                      {d.department}
+                    </td>
+                  ))}
+                </tr>
+                  <tr>
                     <td><label><b>Action 1</b></label></td>
                     <td className="text-warning"><i className="fa-solid fa-pen-to-square" onClick={() => { EditEmployeesData(em); }}></i></td>
                   </tr>
@@ -470,5 +517,4 @@ function EmployessCrud() {
     </div>
   )
 }
-
 export default EmployessCrud;
